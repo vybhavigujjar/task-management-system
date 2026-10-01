@@ -4,129 +4,305 @@
 
 {% block content %}
 {% if session.get('user_id') %}
-    <!-- Logged In: Task Dashboard -->
-    <div class="row mb-4 align-items-center">
-        <div class="col-md-7">
-            <h2 class="fw-bold mb-1">Welcome, {{ session.get('username') }}! 👋</h2>
-            <p class="text-muted mb-0">Here is your daily task overview.</p>
+    <!-- Calculation of counts -->
+    {% set total_tasks = tasks|length %}
+    {% set done_tasks = tasks|selectattr('status', 'equalto', 'completed')|list|length %}
+    {% set todo_tasks = total_tasks - done_tasks %}
+    {% set percent = (done_tasks / total_tasks * 100)|round|int if total_tasks > 0 else 0 %}
+
+    <!-- Top Banner: User Profile & Quick Stats -->
+    <div class="row g-4 mb-4">
+        <!-- User Profile Card with Avatar -->
+        <div class="col-lg-5">
+            <div class="card card-custom p-4 h-100">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-circle avatar-circle-lg">
+                        {{ session.get('username', 'U')[0]|upper }}
+                    </div>
+                    <div>
+                        <span class="badge bg-primary-subtle text-primary fw-semibold px-2 py-1 rounded-pill mb-1">Active User</span>
+                        <h4 class="fw-bold mb-0 text-dark">{{ session.get('username') }}</h4>
+                        <p class="text-muted small mb-0">TaskFlow Workspace</p>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="mt-4 pt-2 border-top">
+                    <div class="d-flex justify-content-between align-items-center small mb-1">
+                        <span class="fw-semibold text-secondary">Completion Progress</span>
+                        <span class="fw-bold text-primary">{{ percent }}%</span>
+                    </div>
+                    <div class="progress" style="height: 10px; border-radius: 10px; background-color: #e2e8f0;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" 
+                             role="progressbar" 
+                             style="width: {{ percent }}%;" 
+                             aria-valuenow="{{ percent }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between text-muted small mt-2">
+                        <span><strong class="text-primary">{{ todo_tasks }}</strong> to do</span>
+                        <span><strong class="text-success">{{ done_tasks }}</strong> completed</span>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="col-md-5">
-            <div class="d-flex justify-content-md-end gap-2 mt-3 mt-md-0">
-                <span class="badge bg-primary px-3 py-2 fs-6">
-                    Total: {{ tasks|length }}
-                </span>
-                <span class="badge bg-warning text-dark px-3 py-2 fs-6">
-                    Pending: {{ tasks|selectattr('status', 'equalto', 'pending')|list|length }}
-                </span>
-                <span class="badge bg-success px-3 py-2 fs-6">
-                    Completed: {{ tasks|selectattr('status', 'equalto', 'completed')|list|length }}
-                </span>
+
+        <!-- Add New Task Card -->
+        <div class="col-lg-7">
+            <div class="card card-custom p-4 h-100" style="background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%);">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <i class="bi bi-pencil-square fs-5 text-primary"></i>
+                    <h5 class="fw-bold mb-0 text-primary">Quick Add New Task</h5>
+                </div>
+                <form action="{{ url_for('create_task') }}" method="POST">
+                    <div class="row g-2">
+                        <div class="col-md-7">
+                            <input type="text" name="title" class="form-control rounded-3 border-primary-subtle" placeholder="What needs to be done? *" required>
+                        </div>
+                        <div class="col-md-5">
+                            <input type="text" name="description" class="form-control rounded-3 border-primary-subtle" placeholder="Notes/description (optional)">
+                        </div>
+                        <div class="col-12 mt-3">
+                            <button type="submit" class="btn btn-brand w-100 py-2 shadow-sm">
+                                <i class="bi bi-plus-circle me-1"></i> Add To-Do Task
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 
-    <div class="row g-4">
-        <!-- Add Task Card -->
-        <div class="col-lg-4">
-            <div class="card p-4">
-                <h5 class="fw-bold mb-3"><i class="bi bi-plus-circle text-primary me-2"></i>Add New Task</h5>
-                <form action="{{ url_for('create_task') }}" method="POST">
-                    <div class="mb-3">
-                        <label class="form-label small fw-semibold">Task Title</label>
-                        <input type="text" name="title" class="form-control" placeholder="e.g. Buy groceries" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-semibold">Description (Optional)</label>
-                        <textarea name="description" rows="3" class="form-control" placeholder="Add any details or notes..."></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100 fw-semibold">
-                        <i class="bi bi-plus-lg me-1"></i>Create Task
-                    </button>
-                </form>
+    <!-- Task List Section with Highlighted To-Do Items -->
+    <div class="card card-custom p-4">
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4 pb-2 border-bottom">
+            <div>
+                <h5 class="fw-bold mb-1 text-dark">
+                    <i class="bi bi-card-checklist text-primary me-2"></i>Task Board
+                </h5>
+                <p class="text-muted small mb-0">Prioritized with active to-do items highlighted.</p>
+            </div>
+
+            <!-- Filter Badges -->
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-sm btn-outline-primary active rounded-pill px-3" onclick="filterTasks('all')">
+                    All ({{ total_tasks }})
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="filterTasks('todo')">
+                    🔥 To-Do ({{ todo_tasks }})
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="filterTasks('done')">
+                    ✓ Completed ({{ done_tasks }})
+                </button>
             </div>
         </div>
 
-        <!-- Task List Card -->
-        <div class="col-lg-8">
-            <div class="card p-4">
-                <h5 class="fw-bold mb-3"><i class="bi bi-list-check text-primary me-2"></i>My Tasks</h5>
+        {% if tasks %}
+            <!-- SECTION 1: HIGHLIGHTED TO-DO TASKS -->
+            <div id="todoSection" class="mb-4">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <span class="badge bg-primary text-white rounded-pill px-3 py-1">
+                        <i class="bi bi-clock-history me-1"></i> In Progress / To-Do ({{ todo_tasks }})
+                    </span>
+                    <hr class="flex-grow-1 my-0 text-muted opacity-25">
+                </div>
 
-                {% if tasks %}
-                    <div class="list-group list-group-flush">
-                        {% for task in tasks %}
-                            <div class="list-group-item px-0 py-3 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
-                                <div class="flex-grow-1">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <h6 class="mb-0 fw-semibold {% if task.status == 'completed' %}task-done{% endif %}">
-                                            {{ task.title }}
-                                        </h6>
-                                        {% if task.status == 'completed' %}
-                                            <span class="badge bg-success-subtle text-success border border-success-subtle">Completed</span>
-                                        {% else %}
-                                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle">Pending</span>
+                {% set has_todo = false %}
+                <div class="list-group list-group-flush">
+                    {% for task in tasks %}
+                        {% if task.status != 'completed' %}
+                            {% set has_todo = true %}
+                            <div class="task-entry list-group-item task-item-todo p-3 border-0 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3" data-status="todo">
+                                <div class="d-flex align-items-start gap-3 flex-grow-1">
+                                    <div class="avatar-circle" style="width: 32px; height: 32px; font-size: 0.8rem; background: #3b82f6;">
+                                        <i class="bi bi-lightning-charge-fill"></i>
+                                    </div>
+                                    <div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <h6 class="mb-0 fw-bold text-dark">{{ task.title }}</h6>
+                                            <span class="badge badge-todo px-2 py-1 rounded-pill small">To-Do</span>
+                                        </div>
+                                        {% if task.description %}
+                                            <p class="small text-secondary mb-0 mt-1">{{ task.description }}</p>
                                         {% endif %}
                                     </div>
-                                    {% if task.description %}
-                                        <p class="small text-muted mb-0 mt-1 {% if task.status == 'completed' %}task-done{% endif %}">
-                                            {{ task.description }}
-                                        </p>
-                                    {% endif %}
                                 </div>
+
                                 <div class="d-flex align-items-center gap-2">
-                                    <!-- Toggle Complete / Pending -->
+                                    <!-- Mark Done Button -->
                                     <form action="{{ url_for('update_task', task_id=task.id) }}" method="POST" class="d-inline">
-                                        {% if task.status == 'completed' %}
-                                            <input type="hidden" name="status" value="pending">
-                                            <button type="submit" class="btn btn-outline-warning btn-sm" title="Mark as Pending">
-                                                <i class="bi bi-arrow-counterclockwise"></i>
-                                            </button>
-                                        {% else %}
-                                            <input type="hidden" name="status" value="completed">
-                                            <button type="submit" class="btn btn-outline-success btn-sm" title="Mark as Done">
-                                                <i class="bi bi-check-lg"></i> Done
-                                            </button>
-                                        {% endif %}
+                                        <input type="hidden" name="status" value="completed">
+                                        <button type="submit" class="btn btn-success btn-sm rounded-pill px-3 shadow-sm" title="Mark as Completed">
+                                            <i class="bi bi-check-circle me-1"></i>Mark Done
+                                        </button>
                                     </form>
 
-                                    <!-- Delete Task -->
-                                    <form action="{{ url_for('delete_task', task_id=task.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this task?');">
-                                        <button type="submit" class="btn btn-outline-danger btn-sm" title="Delete Task">
+                                    <!-- Delete Button -->
+                                    <form action="{{ url_for('delete_task', task_id=task.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this task?');">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill" title="Delete Task">
                                             <i class="bi bi-trash3"></i>
                                         </button>
                                     </form>
                                 </div>
                             </div>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    <div class="text-center py-5">
-                        <i class="bi bi-clipboard2-check display-3 text-muted"></i>
-                        <h5 class="mt-3 text-muted">No tasks yet!</h5>
-                        <p class="text-muted small">Use the form on the left to add your first task.</p>
-                    </div>
-                {% endif %}
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if todo_tasks == 0 %}
+                        <div class="text-center py-4 bg-light rounded-3">
+                            <i class="bi bi-stars text-warning fs-3"></i>
+                            <p class="mb-0 fw-semibold text-muted mt-2">All caught up! No pending to-do tasks.</p>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
-        </div>
+
+            <!-- SECTION 2: COMPLETED TASKS -->
+            <div id="doneSection">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1">
+                        <i class="bi bi-check-all me-1"></i> Completed Archive ({{ done_tasks }})
+                    </span>
+                    <hr class="flex-grow-1 my-0 text-muted opacity-25">
+                </div>
+
+                <div class="list-group list-group-flush">
+                    {% for task in tasks %}
+                        {% if task.status == 'completed' %}
+                            <div class="task-entry list-group-item task-item-done p-3 border-0 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3" data-status="done">
+                                <div class="d-flex align-items-start gap-3 flex-grow-1">
+                                    <div class="avatar-circle" style="width: 32px; height: 32px; font-size: 0.8rem; background: #10b981;">
+                                        <i class="bi bi-check2"></i>
+                                    </div>
+                                    <div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <h6 class="mb-0 fw-semibold task-done-text">{{ task.title }}</h6>
+                                            <span class="badge badge-done px-2 py-1 rounded-pill small">Done</span>
+                                        </div>
+                                        {% if task.description %}
+                                            <p class="small task-done-text mb-0 mt-1">{{ task.description }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="d-flex align-items-center gap-2">
+                                    <!-- Mark as Pending -->
+                                    <form action="{{ url_for('update_task', task_id=task.id) }}" method="POST" class="d-inline">
+                                        <input type="hidden" name="status" value="pending">
+                                        <button type="submit" class="btn btn-outline-secondary btn-sm rounded-pill" title="Reopen Task">
+                                            <i class="bi bi-arrow-counterclockwise me-1"></i>Reopen
+                                        </button>
+                                    </form>
+
+                                    <!-- Delete Button -->
+                                    <form action="{{ url_for('delete_task', task_id=task.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this task?');">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill" title="Delete Task">
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if done_tasks == 0 %}
+                        <div class="text-center py-3 text-muted small">
+                            No completed tasks yet. Mark some to-do tasks as done!
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+        {% else %}
+            <!-- Zero tasks state -->
+            <div class="text-center py-5">
+                <div class="avatar-circle avatar-circle-lg mx-auto mb-3" style="background: #e0ecf8; color: #3b82f6;">
+                    <i class="bi bi-journal-plus"></i>
+                </div>
+                <h5 class="fw-bold text-dark">No tasks created yet!</h5>
+                <p class="text-muted small">Use the card above to add your first to-do item and stay productive.</p>
+            </div>
+        {% endif %}
     </div>
 
+    <!-- Simple client-side filter script -->
+    <script>
+        function filterTasks(type) {
+            const todoSection = document.getElementById('todoSection');
+            const doneSection = document.getElementById('doneSection');
+            const buttons = document.querySelectorAll('.card-custom button');
+
+            if (type === 'all') {
+                if (todoSection) todoSection.style.display = 'block';
+                if (doneSection) doneSection.style.display = 'block';
+            } else if (type === 'todo') {
+                if (todoSection) todoSection.style.display = 'block';
+                if (doneSection) doneSection.style.display = 'none';
+            } else if (type === 'done') {
+                if (todoSection) todoSection.style.display = 'none';
+                if (doneSection) doneSection.style.display = 'block';
+            }
+        }
+    </script>
+
 {% else %}
-    <!-- Logged Out: Hero Landing Section -->
+    <!-- Logged Out: Hero Landing Section with Light Blue Styling -->
     <div class="row justify-content-center text-center py-5">
         <div class="col-lg-8">
-            <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-semibold mb-3">
-                Simple &bull; Fast &bull; Secure
-            </span>
-            <h1 class="display-4 fw-bold mb-3">Stay Organized, <br>Get Things Done.</h1>
-            <p class="lead text-muted mb-4">
-                A simple, elegant task management system built with Flask and SQLite. Create tasks, track your progress, and boost your daily productivity.
+            <div class="d-inline-flex align-items-center gap-2 bg-white px-3 py-2 rounded-pill shadow-sm border border-primary-subtle mb-4">
+                <div class="avatar-circle" style="width: 24px; height: 24px; font-size: 0.75rem;">
+                    <i class="bi bi-stars"></i>
+                </div>
+                <span class="small fw-semibold text-primary">Your Personal Productivity Hub</span>
+            </div>
+            
+            <h1 class="display-4 fw-bold mb-3 text-dark">
+                Organize Your Work, <br>
+                <span style="color: #2563eb;">One Task at a Time.</span>
+            </h1>
+            <p class="lead text-secondary mb-4 mx-auto" style="max-width: 600px;">
+                Experience intuitive task management with highlighted to-do priorities, progress tracking, and secure SQLite authentication.
             </p>
             <div class="d-flex justify-content-center gap-3">
-                <a href="{{ url_for('signup') }}" class="btn btn-primary btn-lg px-4 fw-semibold shadow-sm">
-                    Get Started Free
+                <a href="{{ url_for('signup') }}" class="btn btn-brand btn-lg px-4 shadow-sm">
+                    <i class="bi bi-rocket-takeoff me-2"></i>Create Free Account
                 </a>
-                <a href="{{ url_for('login') }}" class="btn btn-outline-dark btn-lg px-4 fw-semibold">
-                    Log In
+                <a href="{{ url_for('login') }}" class="btn btn-outline-primary btn-lg px-4 bg-white">
+                    Sign In
                 </a>
+            </div>
+
+            <!-- Features Cards Grid -->
+            <div class="row g-4 mt-5 text-start">
+                <div class="col-md-4">
+                    <div class="card card-custom p-4 h-100">
+                        <div class="avatar-circle mb-3">
+                            <i class="bi bi-lightning-charge"></i>
+                        </div>
+                        <h6 class="fw-bold">Highlighted To-Do</h6>
+                        <p class="text-muted small mb-0">Never lose track of what matters. Active tasks stand out with priority highlights.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card card-custom p-4 h-100">
+                        <div class="avatar-circle mb-3" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                            <i class="bi bi-graph-up-arrow"></i>
+                        </div>
+                        <h6 class="fw-bold">Visual Progress</h6>
+                        <p class="text-muted small mb-0">Track your daily completion rate with animated progress bars.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card card-custom p-4 h-100">
+                        <div class="avatar-circle mb-3" style="background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);">
+                            <i class="bi bi-shield-lock"></i>
+                        </div>
+                        <h6 class="fw-bold">Secure Sessions</h6>
+                        <p class="text-muted small mb-0">Your tasks are completely private and secured with Bcrypt password encryption.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
