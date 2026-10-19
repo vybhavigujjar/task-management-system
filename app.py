@@ -64,7 +64,7 @@ def home():
     if 'user_id' in session:
         user_tasks = Task.query.filter_by(user_id=session['user_id']).order_by(Task.id.desc()).all()
         return render_template('index.html', tasks=user_tasks)
-    return render_template('index.html')
+    return render_template('landing.html')
 
 
 @app.route('/signup', methods=['GET', 'POST'])

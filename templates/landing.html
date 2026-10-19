@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forma — We craft bold ideas</title>
+    <!-- Google Fonts: Inter & Instrument Serif -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        .serif-italic {
+            font-family: 'Instrument Serif', serif;
+            font-style: italic;
+            font-weight: 400;
+        }
+    </style>
+</head>
+<body class="bg-white">
+    <div class="min-h-screen bg-white p-3 sm:p-4 md:p-6">
+        <!-- One large rounded card -->
+        <div class="relative rounded-2xl sm:rounded-3xl overflow-hidden min-h-[calc(100vh-24px)] sm:min-h-[calc(100vh-32px)] md:min-h-[calc(100vh-48px)] lg:h-[calc(100vh-48px)]">
+            <!-- Background Video -->
+            <video class="absolute inset-0 w-full h-full object-cover" autoplay muted loop playsinline>
+                <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260602_150901_c45b90ec-18d7-42ff-90e2-b95d7109e330.mp4" type="video/mp4">
+            </video>
+
+            <!-- Content layer -->
+            <div class="relative z-10 flex flex-col min-h-[calc(100vh-24px)] sm:min-h-[calc(100vh-32px)] md:min-h-[calc(100vh-48px)] lg:h-full p-4 sm:p-6 md:p-8 gap-6">
+                <!-- Floating Navbar (top) -->
+                <header class="flex items-center">
+                    <nav class="bg-white/60 backdrop-blur-md rounded-2xl shadow-sm pl-3 sm:pl-4 pr-2 py-2 w-full sm:w-auto flex items-center gap-3 sm:gap-6">
+                        <!-- Stylized "M" Logo -->
+                        <a href="{{ url_for('home') }}" class="flex items-center" aria-label="Home">
+                            <svg class="w-8 h-8 shrink-0" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M 256 256 L 128 256 L 0 128 L 128 128 Z M 256 128 L 128 128 L 0 0 L 128 0 Z" fill="black"/>
+                            </svg>
+                        </a>
+
+                        <!-- Links (hidden on mobile, shown sm:flex) -->
+                        <div class="hidden sm:flex items-center gap-6">
+                            <a href="#story" class="text-gray-800 text-sm font-medium hover:opacity-60 transition-opacity whitespace-nowrap">Our story</a>
+                            <a href="#expertise" class="text-gray-800 text-sm font-medium hover:opacity-60 transition-opacity whitespace-nowrap">Expertise</a>
+                            <a href="#work" class="text-gray-800 text-sm font-medium hover:opacity-60 transition-opacity whitespace-nowrap">Our work</a>
+                            <a href="#journal" class="text-gray-800 text-sm font-medium hover:opacity-60 transition-opacity whitespace-nowrap">Journal</a>
+                        </div>
+
+                        <!-- CTA buttons -->
+                        <div class="ml-auto sm:ml-0 flex items-center gap-2">
+                            <a href="{{ url_for('login') }}" class="text-gray-800 text-sm font-medium hover:opacity-60 transition-opacity px-2 sm:px-3 py-2 whitespace-nowrap">
+                                Log in
+                            </a>
+                            <a href="{{ url_for('signup') }}" class="bg-black text-white text-sm font-medium px-4 sm:px-5 py-2 rounded-xl hover:bg-gray-800 transition-colors whitespace-nowrap">
+                                Start a project
+                            </a>
+                        </div>
+                    </nav>
+                </header>
+
+                <!-- Spacer -->
+                <div class="flex-1 min-h-[2rem]"></div>
+
+                <!-- Bottom row (headline + form) -->
+                <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+                    <!-- Headline (left) -->
+                    <p class="text-white text-3xl sm:text-4xl xl:text-5xl font-medium leading-tight drop-shadow-lg lg:max-w-lg xl:max-w-2xl shrink-0">
+                        We craft bold ideas<br>
+                        and ship them as <span class="serif-italic">products</span>
+                    </p>
+
+                    <!-- Contact form card (right) -->
+                    <div id="contact" class="w-full lg:w-[min(480px,45%)] shrink-0">
+                        <div class="bg-white rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden p-4 sm:p-6 flex flex-col gap-4">
+                            <!-- Heading -->
+                            <h2 class="text-xl sm:text-2xl font-semibold text-black tracking-tight">Say hello! 👋</h2>
+
+                            <!-- Email + socials row -->
+                            <div class="flex flex-row items-center justify-between gap-3 bg-gray-50 rounded-2xl px-4 py-2.5">
+                                <div class="min-w-0">
+                                    <span class="text-xs text-gray-500 font-medium block">Drop us a line</span>
+                                    <a href="mailto:hello@forma.co" class="text-blue-600 font-semibold hover:underline truncate text-sm block">hello@forma.co</a>
+                                </div>
+                                <div class="flex items-center gap-1.5 shrink-0">
+                                    <!-- Twitter -->
+                                    <a href="#" aria-label="Twitter" class="w-8 h-8 rounded-xl flex items-center justify-center hover:opacity-80 transition-opacity bg-gray-100 text-gray-800">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path>
+                                        </svg>
+                                    </a>
+                                    <!-- Circle (Dribbble) -->
+                                    <a href="#" aria-label="Circle" class="w-8 h-8 rounded-xl flex items-center justify-center hover:opacity-80 transition-opacity bg-pink-100 text-pink-500">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                        </svg>
+                                    </a>
+                                    <!-- Instagram -->
+                                    <a href="#" aria-label="Instagram" class="w-8 h-8 rounded-xl flex items-center justify-center hover:opacity-80 transition-opacity bg-orange-100 text-orange-400">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect>
+                                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                                            <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line>
+                                        </svg>
+                                    </a>
+                                    <!-- Linkedin -->
+                                    <a href="#" aria-label="LinkedIn" class="w-8 h-8 rounded-xl flex items-center justify-center hover:opacity-80 transition-opacity bg-blue-100 text-blue-600">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                                            <rect width="4" height="12" x="2" y="9"></rect>
+                                            <circle cx="4" cy="4" r="2"></circle>
+                                        </svg>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- OR divider -->
+                            <div class="flex items-center gap-3 my-0.5">
+                                <div class="flex-1 h-px bg-gray-200"></div>
+                                <span class="text-gray-400 font-medium text-sm">OR</span>
+                                <div class="flex-1 h-px bg-gray-200"></div>
+                            </div>
+
+                            <!-- Form & Success State Container -->
+                            <div id="formContainer">
+                                <form id="contactForm" onsubmit="handleFormSubmit(event)" class="flex flex-col gap-4">
+                                    <span class="text-sm font-medium text-black">Tell us about your vision</span>
+
+                                    <!-- Name + Email side by side on sm: -->
+                                    <div class="flex flex-col sm:flex-row gap-2">
+                                        <input type="text" id="nameInput" placeholder="Full name" required class="flex-1 min-w-0 text-sm px-3 py-2.5 rounded-xl border border-gray-200 bg-transparent placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition">
+                                        <input type="email" id="emailInput" placeholder="Email" required class="flex-1 min-w-0 text-sm px-3 py-2.5 rounded-xl border border-gray-200 bg-transparent placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition">
+                                    </div>
+
+                                    <!-- Textarea -->
+                                    <textarea id="messageInput" rows="4" placeholder="What are you looking to build or improve..." required class="flex-1 min-w-0 text-sm px-3 py-2.5 rounded-xl border border-gray-200 bg-transparent placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition resize-none"></textarea>
+
+                                    <!-- Service tags section -->
+                                    <div class="flex flex-col gap-1.5">
+                                        <span class="text-xs sm:text-sm font-medium text-gray-700">I need help with...</span>
+                                        <div class="flex flex-wrap gap-1.5" id="servicesGrid">
+                                            <!-- Exact 9 services in order -->
+                                            <button type="button" onclick="toggleTag(this)" class="tag-btn text-xs font-medium px-3 py-2 rounded-lg border transition-all bg-white text-gray-700 border-gray-200 hover:border-gray-400">Website</button>
+                                            <button type="button" onclick="toggleTag(this)" class="tag-btn text-xs font-medium px-3 py-2 rounded-lg border transition-all bg-white text-gray-700 border-gray-200 hover:border-gray-400">Mobile App</button>
+                                            <button type="button" onclick="toggleTag(this)" class="tag-btn text-xs font-medium px-3 py-2 rounded-lg border transition-all bg-white text-gray-700 border-gray-200 hover:border-gray-400">Web App</button>
+                                            <button type="button" onclick="toggleTag(this)" class="tag-btn text-xs font-medium px-3 py-2 rounded-lg border transition-all bg-white text-gray-700 border-gray-200 hover:border-gray-400">E-Commerce</button>
+                                            <button type="button" onclick="toggleTag(this)" class="tag-btn text-xs font-medium px-3 py-2 rounded-lg border transition-all bg-white text-gray-700 border-gray-200 hover:border-gray-400">Visual Identity</button>
+                                            <button type="button" onclick="toggleTag(this)" class="tag-btn text-xs font-medium px-3 py-2 rounded-lg border transition-all bg-white text-gray-700 border-gray-200 hover:border-gray-400">3D & Motion</button>
+                                            <button type="button" onclick="toggleTag(this)" class="tag-btn text-xs font-medium px-3 py-2 rounded-lg border transition-all bg-white text-gray-700 border-gray-200 hover:border-gray-400">Digital Marketing</button>
+                                            <button type="button" onclick="toggleTag(this)" class="tag-btn text-xs font-medium px-3 py-2 rounded-lg border transition-all bg-white text-gray-700 border-gray-200 hover:border-gray-400">Growth & Consulting</button>
+                                            <button type="button" onclick="toggleTag(this)" class="tag-btn text-xs font-medium px-3 py-2 rounded-lg border transition-all bg-white text-gray-700 border-gray-200 hover:border-gray-400">Other</button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Submit button -->
+                                    <button type="submit" id="submitBtn" class="w-full bg-black text-white text-sm font-semibold py-3 rounded-2xl hover:bg-gray-800 transition-colors disabled:opacity-60">
+                                        Send my message
+                                    </button>
+                                </form>
+
+                                <!-- Success State (hidden initially) -->
+                                <div id="successState" class="hidden py-6 gap-3 flex flex-col items-center justify-center text-center">
+                                    <div class="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center text-xl text-green-600">
+                                        ✓
+                                    </div>
+                                    <h3 class="text-base font-semibold text-gray-900">You're all set!</h3>
+                                    <p class="text-sm text-gray-500">Expect a reply within 24 hours.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive script for tag selection and 1-second submission delay -->
+    <script>
+        function toggleTag(button) {
+            const isSelected = button.classList.contains('bg-gray-100');
+            if (isSelected) {
+                button.classList.remove('bg-gray-100', 'text-black', 'border-black');
+                button.classList.add('bg-white', 'text-gray-700', 'border-gray-200');
+            } else {
+                button.classList.remove('bg-white', 'text-gray-700', 'border-gray-200');
+                button.classList.add('bg-gray-100', 'text-black', 'border-black');
+            }
+        }
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            const contactForm = document.getElementById('contactForm');
+            const successState = document.getElementById('successState');
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'Sending...';
+
+            // 1-second simulated delay as specified
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            contactForm.classList.add('hidden');
+            successState.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
